@@ -1,0 +1,65 @@
+#CCIT:
+#  CIT1:
+#    ADDCIT11:
+#        - DCIT111
+#        - DCIT112
+#        - ITO111
+#        - ITO112
+#    ADDCIT12:
+#        - DCIT121
+#        - DCIT122
+#        - ITO121
+#        - ITO122
+#    ADDCIT13:
+#        - DCIT131
+#        - DCIT132
+#        - ITO131
+#        - ITO132
+#  CIT2:
+#    ADDCIT21:
+#        - DCIT211
+#        - DCIT212
+#        - ITO211
+#        - ITO212
+#    ADDCIT22:
+#        - DCIT221
+#        - DCIT222
+#        - ITO221
+#        - ITO222
+#    ADDCIT23:
+#        - DCIT231
+#        - DCIT232
+#        - ITO231
+#        - ITO232
+#  CIT3:
+#    ADDCIT31:
+#        - DCIT311
+#        - DCIT312
+#        - ITO311
+#        - ITO312
+#    ADDCIT32:
+#        - DCIT321
+#        - DCIT322
+#        - ITO321
+#        - ITO322
+#    ADDCIT33:
+#        - DCIT331
+#        - DCIT332
+#        - ITO331
+#        - ITO332
+#  CIT4:
+#    ADDCIT41:
+#        - DCIT411
+#        - DCIT412
+#        - ITO411
+#        - ITO412
+#    ADDCIT42:
+#        - DCIT421
+#        - DCIT422
+#        - ITO421
+#        - ITO422
+#    ADDCIT43:
+#        - DCIT431
+#        - DCIT432
+#        - ITO431
+#        - ITO432
