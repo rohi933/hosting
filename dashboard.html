@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inline CSS for the dashboard page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative; /* Required for absolute positioning of the button */
+        }
+
+        h1 {
+            color: #333;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        h2 {
+            color: #555;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #back-to-home {
+            position: absolute; /* Absolute positioning */
+            top: 20px;
+            right: 20px;
+            margin: 0;
+        }
+
+        #disposed-appl {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: none; /* Hidden by default, will be shown based on role */
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-input {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<button id="back-to-home">Back to Home Page</button>
+<h1>Dashboard</h1>
+<button id="disposed-appl">DISPOSED APPL</button>
+<table id="details-table">
+    <thead>
+    <tr>
+        <th>PAN</th>
+        <th>TypeOfApplication</th>
+        <th>DateOfApplication</th>
+        <th>PENDENCY SINCE(DAYS)</th>
+        <!-- Hierarchy columns will be generated here -->
+        <th>Action</th> <!-- Action column for ITO and DCIT -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Details will be populated here -->
+    </tbody>
+</table>
+
+<!-- Calendar input elements -->
+<div id="calendar-container" class="calendar-input">
+    <label for="calendar-input">Select Date:</label>
+    <input type="date" id="calendar-input">
+    <button id="save-date">Save</button>
+    <button id="cancel-date">Cancel</button>
+</div>
+
+<script src="dashboard-scripts.js"></script>
+</body>
+</html>

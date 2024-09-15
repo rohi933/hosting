@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inline CSS for the application page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            position: relative; /* Needed for positioning the logout button */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #user-role {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px; /* Consistent padding for equal size */
+            font-size: 16px; /* Same font size for consistency */
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+            display: inline-block; /* Ensures buttons have equal height */
+            text-align: center; /* Center text inside button */
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #view-dashboard {
+            /* No extra styling needed as it inherits from button */
+        }
+
+        #submit-details {
+            display: none; /* Initially hidden */
+        }
+
+        #logout {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #f44336; /* Red color for logout button */
+            padding: 8px 16px; /* Adjust padding for consistency */
+            font-size: 14px; /* Adjust font size for consistency */
+        }
+    </style>
+</head>
+<body>
+<button id="logout">Logout</button>
+<h1>Welcome to the Application</h1>
+<div id="user-role"></div>
+<button id="submit-details">Submit Details</button>
+<button id="view-dashboard">View Dashboard</button>
+
+<script src="app-scripts.js"></script>
+</body>
+</html>
