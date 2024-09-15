@@ -283,6 +283,43 @@ const findHierarchyPath = (hierarchy, startUser, endUser) => {
 };
 
 
+//app.get('/data', async (req, res) => {
+//    const { username } = req.query;
+//    console.log('Retrieved username from query:', username); // Debugging statement
+//
+//    try {
+//        const hierarchy = await loadHierarchy();
+//        const permissions = await getUserPermissions(username);
+//
+//        if (permissions.length > 0) {
+//            const allowedUsers = new Set([...permissions, username]);
+//
+//            // Collect all data from allowed users
+//            const allData = await readCsvFile(dataCsvFilePath);
+//            const result = [];
+//
+//            for (const record of allData) {
+//                if (allowedUsers.has(record.Username)) {
+//                    // Find the path between the current user and the submitter
+//                    const additionalUsers = findHierarchyPath(hierarchy, username, record.Username);
+//                    result.push({
+//                        ...record,
+//                        additional_users: additionalUsers // Include the additional users in the record
+//                    });
+//                }
+//            }
+//
+//            console.log('Filtered data with additional users:', result); // Debugging statement
+//            res.json(result);
+//        } else {
+//            res.status(403).send('User not authorized to view data');
+//        }
+//    } catch (error) {
+//        console.error('Error retrieving data:', error); // Debugging statement
+//        res.status(500).send('Internal Server Error');
+//    }
+//});
+
 app.get('/data', async (req, res) => {
     const { username } = req.query;
     console.log('Retrieved username from query:', username); // Debugging statement
@@ -299,7 +336,7 @@ app.get('/data', async (req, res) => {
             const result = [];
 
             for (const record of allData) {
-                if (allowedUsers.has(record.Username)) {
+                if (allowedUsers.has(record.Username) && !record.DateOfDisposal) {
                     // Find the path between the current user and the submitter
                     const additionalUsers = findHierarchyPath(hierarchy, username, record.Username);
                     result.push({
@@ -319,6 +356,7 @@ app.get('/data', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 app.get('/disposed-applications', async (req, res) => {
     const { username } = req.query;
