@@ -8,16 +8,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const calendarInput = document.getElementById('calendar-input');
     const saveDateButton = document.getElementById('save-date');
     const cancelDateButton = document.getElementById('cancel-date');
-    let selectedRowId = null;
+    let selectedPAN = null;
     let selectedField = null;
 
-    // Function to simplify hierarchy names
-    const simplifyHierarchyName = (name) => {
-        if (name.startsWith('CCIT')) return 'CCIT';
-        if (name.startsWith('ADDCIT')) return 'ADDCIT';
-        if (name.startsWith('CIT')) return 'CIT';
-        if (name.startsWith('ITO') || name.startsWith('DCIT')) return 'ITO/DCIT';
-        return name; // Default case if no match is found
+    // Role-based column headers mapping
+    const roleColumns = {
+        'CCIT': ['CCIT', 'CIT', 'ADDCIT', 'ITO/DCIT'],
+        'CIT': ['CIT', 'ADDCIT', 'ITO/DCIT'],
+        'ADDCIT': ['ADDCIT', 'ITO/DCIT'],
+        'ITO': ['ITO/DCIT'],
+        'DCIT': ['ITO/DCIT']
     };
 
     // Function to calculate days since the application
@@ -37,32 +37,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     disposedApplButton.addEventListener('click', () => {
-                window.location.href = 'disposed_appl.html'; // Redirect to the new page
-            });
+        window.location.href = 'disposed_appl.html'; // Redirect to the new page
+    });
 
     try {
         // Fetch data from the server using the username query parameter
         const response = await fetch(`/data?username=${username}`);
         const data = await response.json();
 
-        // Determine unique hierarchy levels
-        const uniqueHierarchies = new Set();
-        data.forEach(record => {
-            record.additional_users.forEach(user => uniqueHierarchies.add(user));
-        });
+        // Determine the columns based on the role
+        const columns = roleColumns[role] || [];
 
-        // Create table headers dynamically for hierarchy levels and add the new fixed column
+        // Create table headers dynamically based on role
         detailsTableHead.innerHTML = `
             <th>PAN</th>
             <th>TypeOfApplication</th>
             <th>DateOfApplication</th>
             <th>PENDENCY SINCE(DAYS)</th>
         `;
-        [...uniqueHierarchies].forEach(user => {
+        columns.forEach(col => {
             const th = document.createElement('th');
-            th.textContent = simplifyHierarchyName(user); // Simplify the hierarchy name
+            th.textContent = col; // Use the role-based column name
             detailsTableHead.appendChild(th);
         });
+
         if (role && ['ITO', 'DCIT'].includes(role)) {
             const actionTh = document.createElement('th');
             actionTh.textContent = 'Action';
@@ -73,9 +71,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         detailsTableBody.innerHTML = '';
 
         // Populate the table with data records
-        data.forEach((record, index) => {
+        // Populate the table with data records
+        data.forEach(record => {
+            console.log('Processing record:', record); // Log the entire record
+
             const tr = document.createElement('tr');
-            const additionalUsers = new Set(record.additional_users);
+            const additionalUsers = Array.from(record.additional_users); // Convert Set to Array
 
             // Add data cells for PAN, TypeOfApplication, DateOfApplication
             tr.innerHTML = `
@@ -85,10 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${calculateDaysSince(record.DateOfApplication)}</td>
             `;
 
-            // Add cells for each dynamically created hierarchy level
-            [...uniqueHierarchies].forEach(user => {
+            // Add cells for each fixed hierarchy level based on the additional users array
+            columns.forEach((col, index) => {
                 const td = document.createElement('td');
-                td.textContent = additionalUsers.has(user) ? user : '';
+                // Assign additional users to columns based on their index
+                td.textContent = additionalUsers[index] || ''; // Use empty string if no user available
+                console.log(`Column "${col}" assigned user: ${td.textContent}`);
                 tr.appendChild(td);
             });
 
@@ -97,19 +100,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const actionTd = document.createElement('td');
                 actionTd.className = 'action-buttons';
                 actionTd.innerHTML = `
-                    <button class="query-date-btn" data-row-id="${index}" data-field="DateOfQuery">DateOfQuery Raised</button>
-                    <button class="disposal-date-btn" data-row-id="${index}" data-field="DateOfDisposal">DateOfDisposal</button>
+                    <button class="query-date-btn" data-pan="${record.PAN}" data-field="DateOfQuery">DateOfQuery Raised</button>
+                    <button class="disposal-date-btn" data-pan="${record.PAN}" data-field="DateOfDisposal">DateOfDisposal</button>
                 `;
+                console.log('Action buttons HTML:', actionTd.innerHTML); // Log action buttons HTML
                 tr.appendChild(actionTd);
             }
 
+            // Append the row to the table body
             detailsTableBody.appendChild(tr);
+            console.log('Row added to table body'); // Log when a row is added
         });
 
         // Event listeners for the calendar input and buttons
         document.querySelectorAll('.query-date-btn, .disposal-date-btn').forEach(button => {
             button.addEventListener('click', (event) => {
-                selectedRowId = event.target.dataset.rowId;
+                selectedPAN = event.target.dataset.pan;
                 selectedField = event.target.dataset.field;
                 calendarContainer.style.display = 'block';
                 calendarInput.focus();
@@ -120,12 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const selectedDate = calendarInput.value;
             if (!selectedDate) return; // No date selected
 
-            // Update the corresponding row in the CSV
+            // Update the corresponding record in the CSV using PAN
             const response = await fetch('/update-date', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    rowId: selectedRowId,
+                    PAN: selectedPAN,
                     field: selectedField,
                     date: selectedDate
                 })
@@ -149,5 +155,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.getElementById('back-to-home').addEventListener('click', () => {
     window.location.href = 'app.html'; // Adjust to your home page URL
-
 });
