@@ -50,7 +50,7 @@
             color: #333;
         }
 
-        form input {
+        form input, form select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -118,19 +118,29 @@
 
 <!-- Form for submitting details -->
 <form id="details-form">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
+    <label for="pan">PAN:</label>
+    <input type="text" id="pan" name="pan" required>
+
+    <label for="type-of-application">Type Of Application:</label>
+    <select id="type-of-application" name="typeOfApplication" required>
+        <option value="" disabled selected>Select Type</option>
+        <option value="PCC">PCC</option>
+        <option value="DIT">DIT</option>
+        <option value="LDC">LDC</option>
+    </select>
+
+    <label for="date-of-application">Date Of Application:</label>
+    <input type="date" id="date-of-application" name="dateOfApplication" required>
+
     <button type="submit">Submit</button>
 </form>
 
 <!-- Section to display submitted details -->
 <div id="submitted-details" style="display: none;">
     <h2>Submitted Details:</h2>
-    <p><strong>Name:</strong> <span id="submitted-name"></span></p>
-    <p><strong>Email:</strong> <span id="submitted-email"></span></p>
-    <p><strong>Username:</strong> <span id="submitted-username"></span></p>
+    <p><strong>PAN:</strong> <span id="submitted-pan"></span></p>
+    <p><strong>Type Of Application:</strong> <span id="submitted-type-of-application"></span></p>
+    <p><strong>Date Of Application:</strong> <span id="submitted-date-of-application"></span></p>
 </div>
 
 <script src="submit-scripts.js"></script>
