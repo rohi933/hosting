@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disposed Applications</title>
+    <style>
+        /* Basic reset for margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        /* Button styling */
+        #back-to-home {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            background-color: #28a745; /* Green background */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #back-to-home:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Header styling */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Table styling */
+        #disposed-table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #disposed-table thead {
+            background-color: #28a745; /* Green background */
+            color: #fff;
+        }
+
+        #disposed-table th, #disposed-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #disposed-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<button id="back-to-home">Back to Home</button>
+<h1>Disposed Applications</h1>
+<table id="disposed-table">
+    <thead>
+    <tr>
+        <th>PAN</th>
+        <th>TypeOfApplication</th>
+        <th>DateOfApplication</th>
+        <th>DateOfDisposal</th>
+        <th>TIME TAKEN IN DISPOSING(DAYS)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Rows will be populated by JavaScript -->
+    </tbody>
+</table>
+<script src="disposed_appl.js"></script> <!-- Link to your new JS file -->
+</body>
+</html>
