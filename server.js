@@ -198,26 +198,25 @@ app.post('/submit', async (req, res) => {
 });
 
 
-
-
 app.post('/update-date', async (req, res) => {
-    const { rowId, field, date } = req.body;
-    console.log('Received request to update date:', { rowId, field, date }); // Debugging statement
+    const { PAN, field, date } = req.body;
+    console.log('Received request to update date:', { PAN, field, date }); // Debugging statement
 
     try {
         // Load the existing CSV records
         const records = await readCsvFile(dataCsvFilePath);
         console.log('Loaded records:', records); // Debugging statement
 
-        // Check if the record at rowId exists
-        if (records[rowId]) {
-            console.log('Original record:', records[rowId]); // Debugging statement
+        // Find the record with the matching PAN
+        const recordIndex = records.findIndex(record => record.PAN === PAN);
+        if (recordIndex !== -1) {
+            console.log('Original record:', records[recordIndex]); // Debugging statement
 
             // Ensure field name matches exactly with the CSV header
-            if (field === 'DateOfQuery'  || field === 'DateOfDisposal') {
-                // Update the DateOfDisposal field
-                records[rowId][field] = date;
-                console.log('Updated record:', records[rowId]); // Debugging statement
+            if (field === 'DateOfQuery' || field === 'DateOfDisposal') {
+                // Update the specified field
+                records[recordIndex][field] = date;
+                console.log('Updated record:', records[recordIndex]); // Debugging statement
 
                 // Write the updated records back to the CSV file
                 await writeCSV(dataCsvFilePath, records);
@@ -229,7 +228,7 @@ app.post('/update-date', async (req, res) => {
                 res.status(400).send('Invalid field name');
             }
         } else {
-            console.error('Record not found at index:', rowId); // Debugging statement
+            console.error('Record with PAN not found:', PAN); // Debugging statement
             res.status(404).send('Record not found');
         }
     } catch (error) {
@@ -237,6 +236,7 @@ app.post('/update-date', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 
 
@@ -283,43 +283,6 @@ const findHierarchyPath = (hierarchy, startUser, endUser) => {
 };
 
 
-//app.get('/data', async (req, res) => {
-//    const { username } = req.query;
-//    console.log('Retrieved username from query:', username); // Debugging statement
-//
-//    try {
-//        const hierarchy = await loadHierarchy();
-//        const permissions = await getUserPermissions(username);
-//
-//        if (permissions.length > 0) {
-//            const allowedUsers = new Set([...permissions, username]);
-//
-//            // Collect all data from allowed users
-//            const allData = await readCsvFile(dataCsvFilePath);
-//            const result = [];
-//
-//            for (const record of allData) {
-//                if (allowedUsers.has(record.Username)) {
-//                    // Find the path between the current user and the submitter
-//                    const additionalUsers = findHierarchyPath(hierarchy, username, record.Username);
-//                    result.push({
-//                        ...record,
-//                        additional_users: additionalUsers // Include the additional users in the record
-//                    });
-//                }
-//            }
-//
-//            console.log('Filtered data with additional users:', result); // Debugging statement
-//            res.json(result);
-//        } else {
-//            res.status(403).send('User not authorized to view data');
-//        }
-//    } catch (error) {
-//        console.error('Error retrieving data:', error); // Debugging statement
-//        res.status(500).send('Internal Server Error');
-//    }
-//});
-
 app.get('/data', async (req, res) => {
     const { username } = req.query;
     console.log('Retrieved username from query:', username); // Debugging statement
@@ -356,7 +319,6 @@ app.get('/data', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 app.get('/disposed-applications', async (req, res) => {
     const { username } = req.query;
