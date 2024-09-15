@@ -19,12 +19,14 @@ const hierarchyCsvFilePath = path.join(__dirname, 'docs', 'hierarchy_mapping.csv
 const csvWriter = createObjectCsvWriter({
     path: dataCsvFilePath,
     header: [
-        { id: 'name', title: 'Name' },
-        { id: 'email', title: 'Email' },
-        { id: 'username', title: 'Username' } // Add this line for username
+        { id: 'pan', title: 'PAN' },
+        { id: 'typeOfApplication', title: 'TypeOfApplication' },
+        { id: 'dateOfApplication', title: 'DateOfApplication' },
+        { id: 'username', title: 'Username' }
     ],
     append: true
 });
+
 
 
 // Helper function to read CSV file
@@ -153,13 +155,13 @@ app.post('/login', async (req, res) => {
 
 // Handle form submissions
 app.post('/submit', async (req, res) => {
-    const { name, email, username } = req.body;
+    const { pan, typeOfApplication, dateOfApplication, username } = req.body;
     try {
         const permissions = await getUserPermissions(username);
 
         // Check if the user has permissions to submit data
         if (permissions.length > 0) {
-            await csvWriter.writeRecords([{ name, email, username }]); // Include username in the CSV
+            await csvWriter.writeRecords([{ pan, typeOfApplication, dateOfApplication, username }]);
             res.send('Data saved');
         } else {
             res.status(403).send('User not authorized to submit details');
@@ -169,6 +171,7 @@ app.post('/submit', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 const findHierarchyPath = (hierarchy, startUser, endUser) => {
     const stack = [[startUser]]; // Stack to hold the paths
@@ -226,9 +229,9 @@ app.get('/data', async (req, res) => {
             const result = [];
 
             for (const record of allData) {
-                if (allowedUsers.has(record.submitted_by)) {
+                if (allowedUsers.has(record.Username)) {
                     // Find the path between the current user and the submitter
-                    const additionalUsers = findHierarchyPath(hierarchy, username, record.submitted_by);
+                    const additionalUsers = findHierarchyPath(hierarchy, username, record.Username);
                     result.push({
                         ...record,
                         additional_users: additionalUsers // Include the additional users in the record
