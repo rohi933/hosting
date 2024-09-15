@@ -16,16 +16,26 @@ const usersCsvFilePath = path.join(__dirname, 'docs', 'users.csv');
 const hierarchyCsvFilePath = path.join(__dirname, 'docs', 'hierarchy_mapping.csv');
 
 // Setup CSV writers for data
-const csvWriter = createObjectCsvWriter({
-    path: dataCsvFilePath,
-    header: [
-        { id: 'pan', title: 'PAN' },
-        { id: 'typeOfApplication', title: 'TypeOfApplication' },
-        { id: 'dateOfApplication', title: 'DateOfApplication' },
-        { id: 'username', title: 'Username' }
-    ],
-    append: true
-});
+//const { createObjectCsvWriter } = require('csv-writer');
+
+const writeCSV = async (filePath, records, append = false) => {
+    const csvWriter = createObjectCsvWriter({
+        path: filePath,
+        header: [
+            { id: 'PAN', title: 'PAN' },
+            { id: 'TypeOfApplication', title: 'TypeOfApplication' },
+            { id: 'DateOfApplication', title: 'DateOfApplication' },
+            { id: 'Username', title: 'Username' },
+            { id: 'DateOfQuery', title: 'DateOfQuery' },
+            { id: 'DateOfDisposal', title: 'DateOfDisposal' }
+        ],
+        append: false // Set to true if appending records
+    });
+
+    await csvWriter.writeRecords(records);
+};
+
+
 
 
 
@@ -153,15 +163,30 @@ app.post('/login', async (req, res) => {
 });
 
 
-// Handle form submissions
 app.post('/submit', async (req, res) => {
     const { pan, typeOfApplication, dateOfApplication, username } = req.body;
+    console.log('Received form submission:', { pan, typeOfApplication, dateOfApplication, username });
+
     try {
         const permissions = await getUserPermissions(username);
 
         // Check if the user has permissions to submit data
         if (permissions.length > 0) {
-            await csvWriter.writeRecords([{ pan, typeOfApplication, dateOfApplication, username }]);
+            // Load existing records
+            const records = await readCsvFile(dataCsvFilePath);
+
+            // Append new record with default values for missing fields
+            records.push({
+                PAN: pan || '',
+                TypeOfApplication: typeOfApplication || '',
+                DateOfApplication: dateOfApplication || '',
+                Username: username || '',
+                DateOfQuery: '',
+                DateOfDisposal: ''
+            });
+
+            // Write updated records to CSV
+            await writeCSV(dataCsvFilePath, records, true); // Append new records
             res.send('Data saved');
         } else {
             res.status(403).send('User not authorized to submit details');
@@ -171,6 +196,51 @@ app.post('/submit', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+
+
+app.post('/update-date', async (req, res) => {
+    const { rowId, field, date } = req.body;
+    console.log('Received request to update date:', { rowId, field, date }); // Debugging statement
+
+    try {
+        // Load the existing CSV records
+        const records = await readCsvFile(dataCsvFilePath);
+        console.log('Loaded records:', records); // Debugging statement
+
+        // Check if the record at rowId exists
+        if (records[rowId]) {
+            console.log('Original record:', records[rowId]); // Debugging statement
+
+            // Ensure field name matches exactly with the CSV header
+            if (field === 'DateOfQuery'  || field === 'DateOfDisposal') {
+                // Update the DateOfDisposal field
+                records[rowId][field] = date;
+                console.log('Updated record:', records[rowId]); // Debugging statement
+
+                // Write the updated records back to the CSV file
+                await writeCSV(dataCsvFilePath, records);
+                console.log('Records written to CSV successfully.'); // Debugging statement
+
+                res.send('Date updated successfully');
+            } else {
+                console.error('Invalid field name:', field); // Debugging statement
+                res.status(400).send('Invalid field name');
+            }
+        } else {
+            console.error('Record not found at index:', rowId); // Debugging statement
+            res.status(404).send('Record not found');
+        }
+    } catch (error) {
+        console.error('Error updating date:', error); // Debugging statement
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
 
 
 const findHierarchyPath = (hierarchy, startUser, endUser) => {
@@ -250,6 +320,42 @@ app.get('/data', async (req, res) => {
     }
 });
 
+app.get('/disposed-applications', async (req, res) => {
+    const { username } = req.query;
+    console.log('Retrieved username from query:', username); // Debugging statement
+
+    try {
+        const hierarchy = await loadHierarchy();
+        const permissions = await getUserPermissions(username);
+
+        if (permissions.length > 0) {
+            const allowedUsers = new Set([...permissions, username]);
+
+            // Collect all data from allowed users
+            const allData = await readCsvFile(dataCsvFilePath);
+            const result = [];
+
+            for (const record of allData) {
+                if (allowedUsers.has(record.Username) && record.DateOfDisposal) {
+                    // Find the path between the current user and the submitter
+                    const additionalUsers = findHierarchyPath(hierarchy, username, record.Username);
+                    result.push({
+                        ...record,
+                        additional_users: additionalUsers // Include the additional users in the record
+                    });
+                }
+            }
+
+            console.log('Filtered disposed data with additional users:', result); // Debugging statement
+            res.json(result);
+        } else {
+            res.status(403).send('User not authorized to view data');
+        }
+    } catch (error) {
+        console.error('Error retrieving disposed applications:', error); // Debugging statement
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 
